@@ -1,7 +1,8 @@
 import face_recognition
 import cv2
 import numpy as np
-
+import time
+count = 0
 # This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
 # other example, but it includes some basic performance tweaks to make things run a lot faster:
 #   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
@@ -13,25 +14,43 @@ import numpy as np
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
-
 # Load a sample picture and learn how to recognize it.
-obama_image = face_recognition.load_image_file("dima.jpeg")
+
+filenames = [
+    'dima.jpeg',
+    'obama.jpg',
+]
+
+
+test_image = face_recognition.load_image_file(filenames[0])
+test_face_encoding = face_recognition.face_encodings(test_image)[0]
+
+obama_image = face_recognition.load_image_file(filenames[1])
 obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
 
-# Load a second sample picture and learn how to recognize it.
-biden_image = face_recognition.load_image_file("olya.jpg")
-biden_face_encoding = face_recognition.face_encodings(biden_image)[0]
+# unknown_image = face_recognition.load_image_file(filenames[2])
+# unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
+# known_face_encodings.append(unknown_face_encoding)
+
+# # Load a second sample picture and learn how to recognize it.
+# olya_image = face_recognition.load_image_file(fname)
+# olya_face_encoding = face_recognition.face_encodings(olya_image)[0]
 
 # Create arrays of known face encodings and their names
 known_face_encodings = [
+    test_face_encoding,
     obama_face_encoding,
-    biden_face_encoding
-]
-known_face_names = [
-    "Dmitry Smolskiy",
-    "olya_smola"
+
+
 ]
 
+known_face_names = [
+    "Dmitry Smolskiy",
+    "obama",
+    "who_is_it?",
+]
+
+name = ''
 # Initialize some variables
 face_locations = []
 face_encodings = []
@@ -61,18 +80,19 @@ while True:
             name = "Unknown"
 
             # If a match was found in known_face_encodings, just use the first one.
-            if True in matches:
-                first_match_index = matches.index(True)
-                name = known_face_names[first_match_index]
+            # if True in matches:
+            #     first_match_index = matches.index(True)
+            #     name = known_face_names[first_match_index]
 
             # Or instead, use the known face with the smallest distance to the new face
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
             if matches[best_match_index]:
+
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
-            
+
     process_this_frame = not process_this_frame
 
 
@@ -94,6 +114,13 @@ while True:
 
     # Display the resulting image
     cv2.imshow('Video', frame)
+    if name == 'Unknown':
+        count = count + 1
+        cv2.imwrite('unknown{0}.jpg'.format(count), frame)
+        # known_face_names.append('name{0}'.format(count))
+        # print(known_face_names)
+        # filenames.append('unknown{0}.jpg'.format(count))
+        # print('filenames:',filenames)
 
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):

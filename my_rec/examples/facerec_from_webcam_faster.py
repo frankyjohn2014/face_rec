@@ -13,7 +13,7 @@ import numpy as np
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
-
+print("Width: %d, Height: %d, FPS: %d" % (video_capture.get(3), video_capture.get(4), video_capture.get(5)))
 # Load a sample picture and learn how to recognize it.
 obama_image = face_recognition.load_image_file("obama.jpg")
 obama_face_encoding = face_recognition.face_encodings(obama_image)[0]
